@@ -46,3 +46,14 @@
 .show {
     opacity: 1;
 }
+
+.patriot {
+    background-image: url("https://www.csce.gov/wp-content/uploads/2016/02/Flag-of-Russia-1500x770_0.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.patr {
+    height: 500px;
+}

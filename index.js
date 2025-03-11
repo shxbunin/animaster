@@ -212,16 +212,14 @@ function addListeners() {
 
     document.getElementById('worryAnimationBlock')
         .addEventListener('click', worryAnimationHandler);
-
+    
     const мяуAnimationHandler = animaster()
-    .addFadeOut(100)
-        .addDelay(100)
-        .addMove(200, { x: 200, y: -200 })
-        .addFadeIn(100)
-        .addDelay(100)
-        .addMove(200, { x: 400, y: -200 })
         .addMove(200, { x: 200, y: 0 })
-        .addMove(200, { x: 400, y: 0 })
+        .addMove(200, { x: 0, y: 200 })
+        .addMove(200, { x: 200, y: 200 })
+        .addMove(200, { x: 0, y: 200 })
+        .addMove(200, { x: 200, y: 0 })
+        .addMove(200, { x: 0, y: 0 })
         .buildHandler();
 
     document.getElementById('мяуAnimationBlock')
