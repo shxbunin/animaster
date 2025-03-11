@@ -16,6 +16,7 @@ function animaster() {
 
     return {
         _steps: [],
+        
         fadeIn(element, duration) {
             element.style.transitionDuration = `${duration}ms`;
             element.classList.remove('hide');
@@ -41,14 +42,14 @@ function animaster() {
         moveAndHide(element, duration) {
             const moveDuration = (2 * duration) / 5;
             const fadeDuration = (3 * duration) / 5;
-            this.move(element, moveDuration, { x: 100, y: 20 });
-            const fadeOutTimeout = setTimeout(() => {
-                this.fadeOut(element, fadeDuration);
-            }, moveDuration);
+
+            const animation = animaster()
+                .addMove(moveDuration, { x: 100, y: 20 })
+                .addFadeOut(fadeDuration);
+            animation.play(element);
 
             return {
                 reset() {
-                    clearTimeout(fadeOutTimeout);
                     resetMoveAndScale(element);
                     resetFadeOut(element);
                 }
@@ -57,17 +58,16 @@ function animaster() {
 
         showAndHide(element, duration) {
             const step = duration / 3;
-            this.fadeIn(element, step);
-            setTimeout(() => {
-                setTimeout(() => {
-                    this.fadeOut(element, step);
-                }, step);
-            }, step);
+            const animation = animaster()
+                .addFadeIn(step)
+                .addDelay(step)
+                .addFadeOut(step);
+
+            animation.play(element);
         },
 
         heartBeating(element) {
             let isScaledUp = false;
-
             const intervalId = setInterval(() => {
                 if (!isScaledUp) {
                     this.scale(element, 500, 1.4);
@@ -95,6 +95,39 @@ function animaster() {
             return this;
         },
 
+        addScale(duration, ratio) {
+            this._steps.push({
+                name: 'scale',
+                duration: duration,
+                ratio: ratio
+            });
+            return this;
+        },
+
+        addFadeIn(duration) {
+            this._steps.push({
+                name: 'fadeIn',
+                duration: duration
+            });
+            return this;
+        },
+
+        addFadeOut(duration) {
+            this._steps.push({
+                name: 'fadeOut',
+                duration: duration
+            });
+            return this;
+        },
+
+        addDelay(duration) {
+            this._steps.push({
+                name: 'delay',
+                duration: duration
+            });
+            return this;
+        },
+
         play(element) {
             let totalDelay = 0;
             for (let step of this._steps) {
@@ -103,7 +136,17 @@ function animaster() {
                         case 'move':
                             this.move(element, step.duration, step.translation);
                             break;
-                        default:
+                        case 'scale':
+                            this.scale(element, step.duration, step.ratio);
+                            break;
+                        case 'fadeIn':
+                            this.fadeIn(element, step.duration);
+                            break;
+                        case 'fadeOut':
+                            this.fadeOut(element, step.duration);
+                            break;
+                        case 'delay':
+                            // Просто ждем, ничего не делаем
                             break;
                     }
                 }, totalDelay);
@@ -123,11 +166,7 @@ function addListeners() {
     document.getElementById('movePlay')
         .addEventListener('click', function () {
             const block = document.getElementById('moveBlock');
-            // Два варианта:
-            // 1) Как и раньше:
-            // animaster().move(block, 1000, { x: 100, y: 10 });
-
-            // 2) С добавлением в steps:
+            // Пример с добавлением в steps:
             animaster()
                 .addMove(1000, { x: 100, y: 10 })
                 .play(block);
@@ -145,7 +184,7 @@ function addListeners() {
             const block = document.getElementById('moveAndHideBlock');
             moveAndHideAnimation = animaster().moveAndHide(block, 3000);
         });
-    // Обработка кнопки reset
+
     document.getElementById('moveAndHideReset')
         .addEventListener('click', function () {
             if (moveAndHideAnimation) {
